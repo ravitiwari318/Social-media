@@ -1,186 +1,294 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
+<!-- Coding by CodingNepal | www.codingnepalweb.com-->
+<html lang="en" dir="ltr">
+  <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content=
-          "width=device-width,initial-scale=1.0">
-    <title>Social Media Login Form</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <title> Login and Registration Form in HTML & CSS | CodingLab </title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fontawesome CDN Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    /*style.css*/
+   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
 body {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #7d2ae8;
+  padding: 30px;
 }
-
-h1 {
-    color: green;
+.container {
+  position: relative;
+  max-width: 850px;
+  width: 100%;
+  background: #fff;
+  padding: 40px 30px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  perspective: 2700px;
 }
-
-.login-container {
-    background-color: rgb(152, 204, 152);
-    border: 2px solid green;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    text-align: center;
-    color: green;
-    max-width: 400px;
+.container .cover {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  width: 50%;
+  z-index: 98;
+  transition: all 1s ease;
+  transform-origin: left;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+.container #flip:checked ~ .cover {
+  transform: rotateY(-180deg);
+}
+.container #flip:checked ~ .forms .login-form {
+  pointer-events: none;
+}
+.container .cover .front,
+.container .cover .back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+.cover .back {
+  transform: rotateY(180deg);
+}
+.container .cover img {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  z-index: 10;
+}
+.container .cover .text {
+  position: absolute;
+  z-index: 10;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.container .cover .text::before {
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  opacity: 0.5;
+  background: #7d2ae8;
+}
+.cover .text .text-1,
+.cover .text .text-2 {
+  z-index: 20;
+  font-size: 26px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+}
+.cover .text .text-2 {
+  font-size: 15px;
+  font-weight: 500;
+}
+.container .forms {
+  height: 100%;
+  width: 100%;
+  background: #fff;
+}
+.container .form-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.form-content .login-form,
+.form-content .signup-form {
+  width: calc(100% / 2 - 25px);
+}
+.forms .form-content .title {
+  position: relative;
+  font-size: 24px;
+  font-weight: 500;
+  color: #333;
+}
+.forms .form-content .title:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 25px;
+  background: #7d2ae8;
+}
+.forms .signup-form .title:before {
+  width: 20px;
+}
+.forms .form-content .input-boxes {
+  margin-top: 30px;
+}
+.forms .form-content .input-box {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  width: 100%;
+  margin: 10px 0;
+  position: relative;
+}
+.form-content .input-box input {
+  height: 100%;
+  width: 100%;
+  outline: none;
+  border: none;
+  padding: 0 30px;
+  font-size: 16px;
+  font-weight: 500;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+.form-content .input-box input:focus,
+.form-content .input-box input:valid {
+  border-color: #7d2ae8;
+}
+.form-content .input-box i {
+  position: absolute;
+  color: #7d2ae8;
+  font-size: 17px;
+}
+.forms .form-content .text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+.forms .form-content .text a {
+  text-decoration: none;
+}
+.forms .form-content .text a:hover {
+  text-decoration: underline;
+}
+.forms .form-content .button {
+  color: #fff;
+  margin-top: 40px;
+}
+.forms .form-content .button input {
+  color: #fff;
+  background: #7d2ae8;
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+.forms .form-content .button input:hover {
+  background: #5b13b9;
+}
+.forms .form-content label {
+  color: #5b13b9;
+  cursor: pointer;
+}
+.forms .form-content label:hover {
+  text-decoration: underline;
+}
+.forms .form-content .login-text,
+.forms .form-content .sign-up-text {
+  text-align: center;
+  margin-top: 25px;
+}
+.container #flip {
+  display: none;
+}
+@media (max-width: 730px) {
+  .container .cover {
+    display: none;
+  }
+  .form-content .login-form,
+  .form-content .signup-form {
     width: 100%;
+  }
+  .form-content .signup-form {
+    display: none;
+  }
+  .container #flip:checked ~ .forms .signup-form {
+    display: block;
+  }
+  .container #flip:checked ~ .forms .login-form {
+    display: none;
+  }
 }
-
-.login-container h2 {
-    margin-bottom: 20px;
-}
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 50px;
-}
-
-.login-form input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 12px;
-}
-
-.login-form button {
-    background-color: #4285f4;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.social-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.social-buttons button {
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.social-buttons button.facebook {
-    background-color: #4c70bd;
-}
-
-.social-buttons button.twitter {
-    background-color: #2ca7f3;
-}
-
-.social-buttons button.google {
-    background-color: #f15847;
-}
-
-.social-buttons button.instagram {
-    background-color: #e650a5;
-}
-
-.social-icons {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 9px;
-}
-
-.social-icons i {
-    font-size: 24px;
-    color: #4285f4;
-}
-
-i {
-    margin-right: 10px;
-}
-
-.social-icons i.facebook {
-    color: #3b5998;
-}
-
-.social-icons i.twitter {
-    color: #1da1f2;
-}
-
-.social-icons i.google {
-    color: #db4a39;
-}
-
-.social-icons i.instagram {
-    color: #C13584;
-}
-
-</style>
-</head>
-
+    </style>
+   </head>
 <body>
-    <div class="login-container">
-        <h1>Social media Marketing</h1>
-        <h3>Social Media Login</h3>
-        <div class="login-form">
-            <input type="text"
-                   id="email"
-                   placeholder="Email" 
-                   autocomplete="off" required>
-            <input type="password"
-                   id="password"
-                   placeholder="Password" 
-                   autocomplete="off" required>
-            <button onclick="submitForm()">Login</button>
+  <div class="container">
+    <input type="checkbox" id="flip">
+    <div class="cover">
+      <div class="front">
+        <img src="images/frontImg.jpg" alt="">
+        <div class="text">
+          <span class="text-1">Every new friend is a <br> new adventure</span>
+          <span class="text-2">Let's get connected</span>
         </div>
-        <div class="social-buttons">
-            <button class="facebook">
-                <i class="fab fa-facebook-f"></i>
-                Login with Facebook
-            </button>
-            <button class="twitter">
-                <i class="fab fa-twitter"></i>
-                Login with Twitter
-            </button>
-            <button class="google">
-                <i class="fab fa-google"></i>
-                Login with Google
-            </button>
-            <button class="instagram">
-                <i class="fab fa-instagram"></i>
-                Login with Instagram
-            </button>
+      </div>
+      <div class="back">
+        <!--<img class="backImg" src="images/backImg.jpg" alt="">-->
+        <div class="text">
+          <span class="text-1">Complete miles of journey <br> with one step</span>
+          <span class="text-2">Let's get started</span>
         </div>
+      </div>
     </div>
-
-    <script>
-        function submitForm() {
-            const email = 
-                  document.getElementById('email').value;
-            const password = 
-                  document.getElementById('password').value;
-
-            window.alert('The form is submitted');
-
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-            
-        }
-    </script>
+    <div class="forms">
+        <div class="form-content">
+          <div class="login-form">
+            <div class="title">Login</div>
+          <form action="#">
+            <div class="input-boxes">
+              <div class="input-box">
+                <i class="fas fa-envelope"></i>
+                <input type="text" placeholder="Enter your email" required>
+              </div>
+              <div class="input-box">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Enter your password" required>
+              </div>
+              <div class="text"><a href="#">Forgot password?</a></div>
+              <div class="button input-box">
+                <input type="submit" value="Sumbit">
+              </div>
+              <div class="text sign-up-text">Don't have an account? <label for="flip">Sigup now</label></div>
+            </div>
+        </form>
+      </div>
+        <div class="signup-form">
+          <div class="title">Signup</div>
+        <form action="#">
+            <div class="input-boxes">
+              <div class="input-box">
+                <i class="fas fa-user"></i>
+                <input type="text" placeholder="Enter your name" required>
+              </div>
+              <div class="input-box">
+                <i class="fas fa-envelope"></i>
+                <input type="text" placeholder="Enter your email" required>
+              </div>
+              <div class="input-box">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Enter your password" required>
+              </div>
+              <div class="button input-box">
+                <input type="submit" value="Sumbit">
+              </div>
+              <div class="text sign-up-text">Already have an account? <label for="flip">Login now</label></div>
+            </div>
+      </form>
+    </div>
+    </div>
+    </div>
+  </div>
 </body>
-
-</html>
+</html><Picture></Picture>
