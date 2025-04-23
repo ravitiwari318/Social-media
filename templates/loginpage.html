@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<!-- Coding by CodingNepal | www.codingnepalweb.com-->
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8">
-    <title> Login and Registration Form in HTML & CSS | CodingLab </title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Fontawesome CDN Link -->
+    <title>Login - Social Media</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='scss/style.scss') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 * {
   margin: 0;
   padding: 0;
@@ -21,7 +19,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #7d2ae8;
+  background: linear-gradient(135deg, #7d2ae8, #5b13b9);
   padding: 30px;
 }
 .container {
@@ -30,8 +28,9 @@ body {
   width: 100%;
   background: #fff;
   padding: 40px 30px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
   perspective: 2700px;
+  border-radius: 20px;
 }
 .container .cover {
   position: absolute;
@@ -68,6 +67,7 @@ body {
   width: 100%;
   object-fit: cover;
   z-index: 10;
+  border-radius: 10px;
 }
 .container .cover .text {
   position: absolute;
@@ -137,9 +137,9 @@ body {
 .forms .form-content .input-box {
   display: flex;
   align-items: center;
-  height: 50px;
+  height: 55px;
   width: 100%;
-  margin: 10px 0;
+  margin: 15px 0;
   position: relative;
 }
 .form-content .input-box input {
@@ -147,11 +147,13 @@ body {
   width: 100%;
   outline: none;
   border: none;
-  padding: 0 30px;
+  padding: 0 45px;
   font-size: 16px;
-  font-weight: 500;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  font-weight: 400;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  background: #f5f6fa;
+  border-radius: 8px;
 }
 .form-content .input-box input:focus,
 .form-content .input-box input:valid {
@@ -180,13 +182,19 @@ body {
 .forms .form-content .button input {
   color: #fff;
   background: #7d2ae8;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0;
   cursor: pointer;
   transition: all 0.4s ease;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 1px;
+  height: 55px;
 }
 .forms .form-content .button input:hover {
-  background: #5b13b9;
+  background: #6620c1;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(125, 42, 232, 0.3);
 }
 .forms .form-content label {
   color: #5b13b9;
@@ -228,14 +236,14 @@ body {
     <input type="checkbox" id="flip">
     <div class="cover">
       <div class="front">
-        <img src="images/frontImg.jpg" alt="">
+        <img src="{{ url_for('static', filename='images/login/frontImg.jpg') }}" alt="login cover">
         <div class="text">
           <span class="text-1">Every new friend is a <br> new adventure</span>
           <span class="text-2">Let's get connected</span>
         </div>
       </div>
       <div class="back">
-        <!--<img class="backImg" src="images/backImg.jpg" alt="">-->
+        <img src="{{ url_for('static', filename='images/login/frontImg.jpg') }}" alt="signup cover">
         <div class="text">
           <span class="text-1">Complete miles of journey <br> with one step</span>
           <span class="text-2">Let's get started</span>
@@ -258,9 +266,9 @@ body {
               </div>
               <div class="text"><a href="#">Forgot password?</a></div>
               <div class="button input-box">
-                <input type="submit" value="Sumbit">
+                <input type="submit" value="Submit">
               </div>
-              <div class="text sign-up-text">Don't have an account? <label for="flip">Sigup now</label></div>
+              <div class="text sign-up-text">Don't have an account? <label for="flip">Signup now</label></div>
             </div>
         </form>
       </div>
@@ -281,7 +289,7 @@ body {
                 <input type="password" placeholder="Enter your password" required>
               </div>
               <div class="button input-box">
-                <input type="submit" value="Sumbit">
+                <input type="submit" value="Submit">
               </div>
               <div class="text sign-up-text">Already have an account? <label for="flip">Login now</label></div>
             </div>
@@ -291,4 +299,4 @@ body {
     </div>
   </div>
 </body>
-</html><Picture></Picture>
+</html>

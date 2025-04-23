@@ -1,16 +1,365 @@
 {% extends 'base.html' %}
-{% block content %}
-
-
-{% endblock %}
-{% block js %}
-<script>
-
-</script>
-{% endblock %}
-{% block css %}
+{% block head %}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<link rel="stylesheet" href="/static/dist/css/iconfont/tabler-icons.css">
+<link rel="stylesheet" href="/static/dist/css/style.css">
 <style>
+.team-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
 
+.team-image {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* Creates a square aspect ratio */
+    overflow: hidden;
+}
+
+.team-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+}
+
+.team-info {
+    padding: 1.5rem;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.team-info h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #2d2d2d;
+}
+
+.team-info p {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.social-links a {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: #7d2ae8;
+    transform: translateY(-2px);
+}
+
+.social-links img {
+    width: 18px;
+    height: 18px;
+}
 </style>
 {% endblock %}
-{% block head %}{% endblock %}
+
+{% block content %}
+<!-- Header Start -->
+<header class="main-header position-fixed w-100">
+    <div class="container">
+        <nav class="navbar navbar-expand-xl py-0">
+            <div class="logo">
+                <a class="navbar-brand py-0 me-0" href="#"><img src="{{ url_for('static', filename='images/Creato-logo.svg') }}" alt=""></a>
+            </div>
+            <a class="d-inline-block d-lg-block d-xl-none d-xxl-none nav-toggler text-decoration-none" data-bs-toggle="offcanvas" href="#offcanvasExample" aria-controls="offcanvasExample">
+                <i class="ti ti-menu-2"></i>
+            </a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">                                             
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/about">About us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Team</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Review</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/loginpage">Login</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <a class="btn btn-primary btn-hover-secondery text-capitalize" href="#">contact us</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header">
+            <div class="logo">
+                <a class="navbar-brand py-0 me-0" href="#"><img src="{{ url_for('static', filename='images/Creato-logo.svg') }}" alt=""></a>
+            </div> 
+            <button type="button" class="btn-close text-reset ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="offcanvas-body pt-0">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/about">About us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Team</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Portfolio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Review</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Pricing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/loginpage">Login</a>
+                </li>
+            </ul>
+            <div class="login d-block align-items-center">
+                <a class="btn btn-primary text-capitalize w-100" href="#">contact us</a>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Header End -->
+
+<!-- About Content -->
+<div class="about-wrapper">
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="container">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="about-content" data-aos="fade-up">
+                        <h1>We Connect People</h1>
+                        <p class="lead">Creating meaningful connections in the digital age through innovative social networking solutions.</p>
+                        <div class="stats-container">
+                            <div class="stats-wrapper">
+                                <div class="stat-item">
+                                    <h3>10K+</h3>
+                                    <p>Active Users</p>
+                                </div>
+                                <div class="stat-item">
+                                    <h3>150+</h3>
+                                    <p>Countries</p>
+                                </div>
+                                <div class="stat-item">
+                                    <h3>24/7</h3>
+                                    <p>Support</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="our-mission">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-4">
+                    <h2 class="section-title" data-aos="fade-up">Our Mission</h2>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="mission-card">
+                        <img src="{{ url_for('static', filename='images/hero/icon_whoweare.svg') }}" alt="Who We Are">
+                        <h3>Who We Are</h3>
+                        <p>A passionate team dedicated to creating meaningful social connections in the digital world.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="mission-card">
+                        <img src="{{ url_for('static', filename='images/hero/icon_whatwedo.svg') }}" alt="What We Do">
+                        <h3>What We Do</h3>
+                        <p>Build innovative platforms that bring people together and foster genuine relationships.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="mission-card">
+                        <img src="{{ url_for('static', filename='images/hero/icon_ourteam.svg') }}" alt="Our Values">
+                        <h3>Our Values</h3>
+                        <p>Privacy, transparency, and user empowerment are at the core of everything we do.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="our-team">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-4">
+                    <h2 class="section-title" data-aos="fade-up">Meet Our Team</h2>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="team-card">
+                        <div class="team-image">
+                            <img src="{{ url_for('static', filename='images/our-team/team1.svg') }}" alt="Team Member">
+                        </div>
+                        <div class="team-info">
+                            <div>
+                                <h3>John Doe</h3>
+                                <p>Founder & CEO</p>
+                            </div>
+                            <div class="social-links">
+                                <a href="#"><img src="{{ url_for('static', filename='images/footer/icon_twitter.svg') }}" alt="Twitter"></a>
+                                <a href="#"><img src="{{ url_for('static', filename='images/footer/icon_linkdin.svg') }}" alt="LinkedIn"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="team-card">
+                        <div class="team-image">
+                            <img src="{{ url_for('static', filename='images/our-team/team2.svg') }}" alt="Team Member">
+                        </div>
+                        <div class="team-info">
+                            <div>
+                                <h3>Jane Smith</h3>
+                                <p>Lead Developer</p>
+                            </div>
+                            <div class="social-links">
+                                <a href="#"><img src="{{ url_for('static', filename='images/footer/icon_twitter.svg') }}" alt="Twitter"></a>
+                                <a href="#"><img src="{{ url_for('static', filename='images/footer/icon_linkdin.svg') }}" alt="LinkedIn"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="team-card">
+                        <div class="team-image">
+                            <img src="{{ url_for('static', filename='images/our-team/team3.svg') }}" alt="Team Member">
+                        </div>
+                        <div class="team-info">
+                            <div>
+                                <h3>Mike Johnson</h3>
+                                <p>Product Designer</p>
+                            </div>
+                            <div class="social-links">
+                                <a href="#"><img src="{{ url_for('static', filename='images/footer/icon_twitter.svg') }}" alt="Twitter"></a>
+                                <a href="#"><img src="{{ url_for('static', filename='images/footer/icon_linkdin.svg') }}" alt="LinkedIn"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-xxl-4 col-xxl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+                <div class="footer-logo-col">
+                    <a href="#"><img src="{{ url_for('static', filename='images/Creato-logo.svg') }}"></a>
+                    <p class="copyrights fs-5 mb-0">Copyright @ <span id="autodate"></span></p>
+                    <ul class="social-icons list-unstyled mb-0 pl-0 d-flex align-items-center">
+                        <li><a href="#" class="rounded-circle"><img src="{{ url_for('static', filename='images/footer/icon_facebook.svg') }}"><img src="{{ url_for('static', filename='images/footer/icon_facebook_white.svg') }}"></a></li>
+                        <li><a href="#" class="rounded-circle"><img src="{{ url_for('static', filename='images/footer/icon_twitter.svg') }}"><img src="{{ url_for('static', filename='images/footer/icon_twitter_white.svg') }}"></a></li>
+                        <li><a href="#" class="rounded-circle"><img src="{{ url_for('static', filename='images/footer/icon_google_plus.svg') }}"><img src="{{ url_for('static', filename='images/footer/icon_google_plus_white.svg') }}"></a></li>
+                        <li><a href="#" class="rounded-circle"><img src="{{ url_for('static', filename='images/footer/icon_linkdin.svg') }}"><img src="{{ url_for('static', filename='images/footer/icon_linkdin_white.svg') }}"></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-xxl-3 col-xxl-3 col-lg-3 col-md-4 col-sm-12 col-12">
+                <h5 class="text-secondary fw-bold fs-4">Quick links</h5>
+                <ul class="list-unstyled mb-0 pl-0">
+                    <li><a href="/" class="text-capitalize fs-6 text-decoration-none">Home</a></li>
+                    <li><a href="/about" class="text-capitalize fs-6 text-decoration-none">about us</a></li>
+                    <li><a href="#" class="text-capitalize fs-6 text-decoration-none">Features</a></li>
+                    <li><a href="#" class="text-capitalize fs-6 text-decoration-none">Team</a></li>
+                    <li><a href="#" class="text-capitalize fs-6 text-decoration-none">Portfolio</a></li>
+                    <li><a href="#" class="text-capitalize fs-6 text-decoration-none">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="col-xxl-5 col-xxl-5 col-lg-5 col-md-8 col-sm-12 col-12">
+                <h5 class="text-secondary fw-bold fs-4">From the blog</h5>
+                <div class="blog mb-3">
+                    <p class="mb-0 fs-6">It has survived not only centuries, that rela but also the all this among lea.</p>
+                    <p class="mt-2 fs-6">16 Mar,2021</p>
+                </div>
+                <div class="blog mb-3">
+                    <p class="mb-0 fs-6">It has survived not only centuries, that rela but also the all this among lea.</p>
+                    <p class="mt-2 fs-6">16 Mar,2021</p>
+                </div>
+                <div class="blog">
+                    <a href="#" class="text-decoration-none text-primary text-capitalize fs-6">read more</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block js %}
+<script src="/static/dist/js/jquery.min.js"></script>
+<script src="/static/dist/js/bootstrap.min.js"></script>
+<script src="/static/dist/js/custom.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS
+    AOS.init({
+        duration: 1000,
+        once: true,
+        offset: 100
+    });
+});
+</script>
+{% endblock %}
