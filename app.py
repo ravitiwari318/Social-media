@@ -14,13 +14,13 @@ def index():
 def about():
     return render_template('about.html')
 
-@app.route('/form', methods=['GET','POST'])
-def forminput():
-    return render_template('form.html')
-
-@app.route('/results', methods=['GET','POST'])
-def result():
-    return render_template('results.html')
+@app.route('/loginpage')
+def login():
+    return render_template('loginpage.html')
+  
+@app.route('/registration')
+def registration():
+    return render_template("registration.html")  
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)

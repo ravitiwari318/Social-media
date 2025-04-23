@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content=
+          "width=device-width,initial-scale=1.0">
+    <title>Social Media Login Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+<style>
+    /*style.css*/
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+h1 {
+    color: green;
+}
+
+.login-container {
+    background-color: rgb(152, 204, 152);
+    border: 2px solid green;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+    color: green;
+    max-width: 400px;
+    width: 100%;
+}
+
+.login-container h2 {
+    margin-bottom: 20px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 50px;
+}
+
+.login-form input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.login-form button {
+    background-color: #4285f4;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.social-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.social-buttons button {
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social-buttons button.facebook {
+    background-color: #4c70bd;
+}
+
+.social-buttons button.twitter {
+    background-color: #2ca7f3;
+}
+
+.social-buttons button.google {
+    background-color: #f15847;
+}
+
+.social-buttons button.instagram {
+    background-color: #e650a5;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 9px;
+}
+
+.social-icons i {
+    font-size: 24px;
+    color: #4285f4;
+}
+
+i {
+    margin-right: 10px;
+}
+
+.social-icons i.facebook {
+    color: #3b5998;
+}
+
+.social-icons i.twitter {
+    color: #1da1f2;
+}
+
+.social-icons i.google {
+    color: #db4a39;
+}
+
+.social-icons i.instagram {
+    color: #C13584;
+}
+
+</style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>Social media Marketing</h1>
+        <h3>Social Media Login</h3>
+        <div class="login-form">
+            <input type="text"
+                   id="email"
+                   placeholder="Email" 
+                   autocomplete="off" required>
+            <input type="password"
+                   id="password"
+                   placeholder="Password" 
+                   autocomplete="off" required>
+            <button onclick="submitForm()">Login</button>
+        </div>
+        <div class="social-buttons">
+            <button class="facebook">
+                <i class="fab fa-facebook-f"></i>
+                Login with Facebook
+            </button>
+            <button class="twitter">
+                <i class="fab fa-twitter"></i>
+                Login with Twitter
+            </button>
+            <button class="google">
+                <i class="fab fa-google"></i>
+                Login with Google
+            </button>
+            <button class="instagram">
+                <i class="fab fa-instagram"></i>
+                Login with Instagram
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function submitForm() {
+            const email = 
+                  document.getElementById('email').value;
+            const password = 
+                  document.getElementById('password').value;
+
+            window.alert('The form is submitted');
+
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            
+        }
+    </script>
+</body>
+
+</html>
