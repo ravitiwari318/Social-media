@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="100" viewBox="0 0 600 200">
+  <style>
+    .text {
+      font-family: 'Poppins', sans-serif;
+      font-size: 64px;
+      font-weight: bold;
+      fill: #000000;
+    }
+  </style>
+  <g transform="translate(20,20)">
+    <rect x="0" y="0" rx="15" ry="15" width="80" height="80" fill="#007BFF"/>
+    <rect x="20" y="25" width="40" height="5" fill="white" rx="2.5"/>
+    <rect x="20" y="40" width="30" height="5" fill="white" rx="2.5"/>
+    <rect x="20" y="55" width="25" height="5" fill="white" rx="2.5"/>
+    <rect x="30" y="-20" width="20" height="30" fill="#007BFF" rx="5"/>
+  </g>
+  <text x="120" y="65" class="text">Social</text>
+  <text x="120" y="135" class="text">Scraper</text>
+</svg>
