@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Profile Scraper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .profile-pic {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e1306c;
+            padding: 3px;
+        }
+        .profile-stats {
+            padding: 1rem 0;
+            border-top: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6;
+            margin: 1rem 0;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #262626;
+        }
+        .stat-label {
+            color: #8e8e8e;
+            font-size: 0.9rem;
+        }
+        .verified-badge {
+            color: #3897f0;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+        .profile-bio {
+            white-space: pre-line;
+            color: #262626;
+        }
+        .profile-username {
+            color: #8e8e8e;
+            font-size: 1.1rem;
+        }
+        .profile-fullname {
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: #262626;
+        }
+        .post-item {
+            margin-bottom: 2rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .post-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+        }
+        .post-stats {
+            font-size: 0.9rem;
+            color: #8e8e8e;
+            padding: 0.5rem;
+        }
+        .comment-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Social Media Scraper</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/instagram">Instagram</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facebook">Facebook</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Instagram Profile Scraper</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="scrapeForm">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Instagram Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required 
+                                    placeholder="Enter username without @ (e.g. cristiano)">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Scrape Profile Data</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="loading" class="text-center mt-4" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Scraping profile data... Please wait.</p>
+                </div>
+
+                <div id="results" class="mt-4" style="display: none;">
+                    <div id="profile-info" class="card mb-4">
+                        <div class="card-body">
+                            <div id="profile-content"></div>
+                        </div>
+                    </div>
+
+                    <div id="posts-section" class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="mb-4">Latest Posts</h3>
+                            <div id="posts-content"></div>
+                        </div>
+                    </div>
+
+                    <div id="analytics-section" class="card mb-4" style="display: none;">
+                        <div class="card-body">
+                            <h3 class="mb-4">Influencer Analytics</h3>
+                            
+                            <!-- Overview Stats -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <h5 class="border-bottom pb-2">Overview</h5>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6>Average Engagement Rate</h6>
+                                                    <h3 class="text-primary" id="engagement-rate"></h3>
+                                                    <span class="badge" id="engagement-quality"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6>Average Likes</h6>
+                                                    <h3 class="text-primary" id="avg-likes"></h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6>Average Comments</h6>
+                                                    <h3 class="text-primary" id="avg-comments"></h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sentiment Analysis -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <h5 class="border-bottom pb-2">Audience Sentiment</h5>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="card bg-success text-white">
+                                                <div class="card-body text-center">
+                                                    <h6>Positive Comments</h6>
+                                                    <h3 id="positive-comments">0</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-warning">
+                                                <div class="card-body text-center">
+                                                    <h6>Neutral Comments</h6>
+                                                    <h3 id="neutral-comments">0</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-danger text-white">
+                                                <div class="card-body text-center">
+                                                    <h6>Negative Comments</h6>
+                                                    <h3 id="negative-comments">0</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Content Analysis -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <h5 class="border-bottom pb-2">Content Analysis</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h6>Content Type Distribution</h6>
+                                                    <div id="content-types"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h6>Posting Patterns</h6>
+                                                    <p id="posting-frequency"></p>
+                                                    <p id="best-posting-time"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function formatNumber(num) {
+            if (!num) return '0';
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return '';
+            return new Date(timestamp * 1000).toLocaleDateString();
+        }
+
+        function displayProfileInfo(profileData) {
+            console.log("Profile Data:", profileData);  // Debug log
+            
+            const verifiedBadge = profileData.isVerified ? 
+                '<svg class="verified-badge" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>' : '';
+
+            const content = `
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <img src="${profileData.profilePicUrl}" class="profile-pic mb-3" alt="Profile Picture" onerror="this.src='https://via.placeholder.com/180'">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="profile-header">
+                            <h2 class="profile-fullname mb-1">
+                                ${profileData.fullName || profileData.username}
+                                ${verifiedBadge}
+                            </h2>
+                            <div class="profile-username mb-3">@${profileData.username}</div>
+                        </div>
+                        
+                        <div class="profile-stats row text-center mb-3">
+                            <div class="col stat-item">
+                                <div class="stat-value">${formatNumber(profileData.postsCount)}</div>
+                                <div class="stat-label">Posts</div>
+                            </div>
+                            <div class="col stat-item">
+                                <div class="stat-value">${formatNumber(profileData.followersCount)}</div>
+                                <div class="stat-label">Followers</div>
+                            </div>
+                            <div class="col stat-item">
+                                <div class="stat-value">${formatNumber(profileData.followsCount)}</div>
+                                <div class="stat-label">Following</div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-bio">
+                            ${profileData.biography || ''}
+                            ${profileData.externalUrl ? `<br><a href="${profileData.externalUrl}" target="_blank">${profileData.externalUrl}</a>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('profile-content').innerHTML = content;
+        }
+
+        function displayPosts(posts) {
+            if (!posts || posts.length === 0) {
+                document.getElementById('posts-content').innerHTML = '<p class="text-muted">No posts found</p>';
+                return;
+            }
+
+            const postsHtml = posts.map(post => `
+                <div class="post-item">
+                    <img src="${post.displayUrl}" class="post-image" alt="Post" onerror="this.src='https://via.placeholder.com/400x400'">
+                    <div class="p-3">
+                        <div class="post-stats mb-2">
+                            ❤️ ${formatNumber(post.likesCount)} likes
+                            💬 ${formatNumber(post.commentsCount)} comments
+                            📅 ${formatDate(post.timestamp)}
+                        </div>
+                        <p class="mb-3">${post.caption || ''}</p>
+                        <div class="comments-section">
+                            <h6>Top Comments:</h6>
+                            ${post.comments && post.comments.length ? post.comments.map(comment => `
+                                <div class="comment-item">
+                                    <strong>@${comment.ownerUsername}</strong>: ${comment.text}
+                                </div>
+                            `).join('') : '<p class="text-muted">No comments yet</p>'}
+                        </div>
+                        <a href="${post.url}" class="btn btn-sm btn-outline-primary mt-2" target="_blank">
+                            View on Instagram
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('posts-content').innerHTML = postsHtml;
+        }
+
+        function displayAnalytics(analytics) {
+            // Show analytics section
+            document.getElementById('analytics-section').style.display = 'block';
+
+            // Overview
+            document.getElementById('engagement-rate').textContent = analytics.engagement.engagement_rate + '%';
+            const qualityBadge = document.getElementById('engagement-quality');
+            qualityBadge.textContent = analytics.engagement.engagement_quality;
+            qualityBadge.className = 'badge ' + 
+                (analytics.engagement.engagement_quality === 'High' ? 'bg-success' : 
+                 analytics.engagement.engagement_quality === 'Medium' ? 'bg-warning' : 'bg-danger');
+            
+            document.getElementById('avg-likes').textContent = formatNumber(analytics.overview.avg_likes_per_post);
+            document.getElementById('avg-comments').textContent = formatNumber(analytics.overview.avg_comments_per_post);
+
+            // Sentiment Analysis
+            document.getElementById('positive-comments').textContent = analytics.sentiment_analysis.positive;
+            document.getElementById('neutral-comments').textContent = analytics.sentiment_analysis.neutral;
+            document.getElementById('negative-comments').textContent = analytics.sentiment_analysis.negative;
+
+            // Content Analysis
+            const contentTypesHtml = Object.entries(analytics.content_analysis.content_types)
+                .map(([type, count]) => `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>${type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                        <span class="badge bg-primary">${count}</span>
+                    </div>
+                `).join('');
+            document.getElementById('content-types').innerHTML = contentTypesHtml;
+
+            // Posting Patterns
+            document.getElementById('posting-frequency').textContent = analytics.content_analysis.posting_frequency.frequency;
+            if (analytics.content_analysis.best_posting_time.best_hour !== undefined) {
+                const hour = analytics.content_analysis.best_posting_time.best_hour;
+                const formattedHour = hour > 12 ? `${hour-12}PM` : `${hour}AM`;
+                document.getElementById('best-posting-time').textContent = `Best posting time: ${formattedHour}`;
+            }
+        }
+
+        document.getElementById('scrapeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('analytics-section').style.display = 'none';
+            
+            try {
+                const formData = new FormData(this);
+                const response = await fetch('/scrape_instagram', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                document.getElementById('loading').style.display = 'none';
+                
+                if (data.success) {
+                    console.log("Received data:", data);
+                    displayProfileInfo(data.data.profile_info);
+                    displayPosts(data.data.posts);
+                    displayAnalytics(data.data.analytics);
+                    document.getElementById('results').style.display = 'block';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html> 
