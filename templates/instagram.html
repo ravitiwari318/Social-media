@@ -5,228 +5,525 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instagram Profile Scraper</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.7.1/dist/gsap.min.js"></script>
     <style>
+        :root {
+            --primary-color: #405DE6;
+            --secondary-color: #E1306C;
+            --accent-color: #F77737;
+            --text-primary: #222222;
+            --text-secondary: #666666;
+            --background-light: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-shadow: 0 4px 16px rgba(64, 93, 230, 0.08);
+        }
+
+        body {
+            background-color: var(--background-light);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Advanced 3D Background Animation */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            overflow: hidden;
+        }
+
+        .social-icon {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            opacity: 0.8;
+            transform-style: preserve-3d;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .social-icon:nth-child(1) { background: linear-gradient(45deg, #833AB4, #E1306C); }
+        .social-icon:nth-child(2) { background: linear-gradient(45deg, #F77737, #FFDC80); }
+        .social-icon:nth-child(3) { background: linear-gradient(45deg, #405DE6, #5851DB); }
+        .social-icon:nth-child(4) { background: linear-gradient(45deg, #E1306C, #833AB4); }
+        .social-icon:nth-child(5) { background: linear-gradient(45deg, #FFDC80, #F77737); }
+        .social-icon:nth-child(6) { background: linear-gradient(45deg, #5851DB, #405DE6); }
+        .social-icon:nth-child(7) { background: linear-gradient(45deg, #833AB4, #E1306C); }
+        .social-icon:nth-child(8) { background: linear-gradient(45deg, #F77737, #FFDC80); }
+        .social-icon:nth-child(9) { background: linear-gradient(45deg, #405DE6, #5851DB); }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: inherit;
+            transform: translateZ(-20px);
+            filter: blur(10px);
+            opacity: 0.5;
+        }
+
+        .social-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: inherit;
+            transform: translateZ(20px);
+            filter: blur(10px);
+            opacity: 0.5;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotateX(0deg) rotateY(0deg) scale(1);
+            }
+            25% {
+                transform: translateY(-50px) rotateX(45deg) rotateY(45deg) scale(1.2);
+            }
+            50% {
+                transform: translateY(-100px) rotateX(90deg) rotateY(90deg) scale(1);
+            }
+            75% {
+                transform: translateY(-50px) rotateX(135deg) rotateY(135deg) scale(1.2);
+            }
+            100% {
+                transform: translateY(0) rotateX(360deg) rotateY(360deg) scale(1);
+            }
+        }
+
+        /* Modern Glassmorphism */
+        .navbar {
+            background: rgba(255,255,255,0.95) !important;
+            box-shadow: 0 2px 8px rgba(64,93,230,0.06);
+        }
+
+        .navbar-brand, .nav-link {
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link.active {
+            color: var(--secondary-color) !important;
+        }
+
+        .card, .content-wrapper .card {
+            background: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            border-radius: 18px;
+            border: none;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(131, 58, 180, 0.1));
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        /* Profile Picture 3D Effect */
         .profile-pic {
             width: 180px;
             height: 180px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #e1306c;
-            padding: 3px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .profile-stats {
-            padding: 1rem 0;
-            border-top: 1px solid #dee2e6;
-            border-bottom: 1px solid #dee2e6;
-            margin: 1rem 0;
+
+        .profile-pic:hover {
+            transform: scale(1.1) rotateY(20deg);
+            box-shadow: 0 15px 40px rgba(131, 58, 180, 0.4);
+            border-color: var(--primary-color);
         }
+
+        /* Stats Hover Effect */
         .stat-item {
             text-align: center;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
+        .stat-item:hover {
+            transform: scale(1.1) translateZ(20px);
+        }
+
         .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #262626;
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(131, 58, 180, 0.3);
         }
+
         .stat-label {
-            color: #8e8e8e;
+            color: var(--text-secondary);
             font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+
         .verified-badge {
-            color: #3897f0;
+            color: var(--primary-color);
             display: inline-block;
             margin-left: 0.5rem;
         }
+
         .profile-bio {
             white-space: pre-line;
-            color: #262626;
+            color: var(--text-primary);
+            line-height: 1.6;
         }
+
         .profile-username {
-            color: #8e8e8e;
+            color: var(--text-secondary);
             font-size: 1.1rem;
+            margin-bottom: 1rem;
         }
+
         .profile-fullname {
-            font-size: 1.8rem;
-            font-weight: 300;
-            color: #262626;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
         }
+
+        /* Post Cards 3D Effect */
         .post-item {
             margin-bottom: 2rem;
-            border: 1px solid #dee2e6;
-            border-radius: 0.5rem;
+            border-radius: 20px;
             overflow: hidden;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: var(--card-bg);
         }
+
+        .post-item:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
         .post-image {
             width: 100%;
             max-height: 400px;
-            object-fit: contain;
+            object-fit: cover;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
+        .post-item:hover .post-image {
+            transform: scale(1.05) translateZ(20px);
+        }
+
         .post-stats {
             font-size: 0.9rem;
-            color: #8e8e8e;
-            padding: 0.5rem;
+            color: var(--text-secondary);
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
         }
+
+        /* Comment Section Modern Style */
         .comment-item {
-            padding: 0.5rem;
-            border-bottom: 1px solid #dee2e6;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            background: rgba(30, 30, 30, 0.5);
         }
-        .comment-item:last-child {
-            border-bottom: none;
+
+        .comment-item:hover {
+            background: rgba(40, 40, 40, 0.7);
+            transform: translateZ(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Modern Button Effects */
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: #fff;
+            border-radius: 25px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(64,93,230,0.10);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+        }
+
+        .btn-primary:active {
+            transform: translateY(0) translateZ(0);
+        }
+
+        /* Form Input Modern Style */
+        .form-control {
+            background: rgba(255,255,255,0.95);
+            border: 1px solid #e0e0e0;
+            color: var(--text-primary) !important;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 1px 4px rgba(64,93,230,0.04);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(64,93,230,0.08);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary) !important;
+            opacity: 1;
+        }
+
+        /* Loading Spinner Animation */
+        .spinner-border {
+            color: var(--primary-color);
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3em;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg) scale(1);
+                box-shadow: 0 0 20px rgba(131, 58, 180, 0.3);
+            }
+            50% {
+                transform: rotate(180deg) scale(1.2);
+                box-shadow: 0 0 30px rgba(131, 58, 180, 0.5);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+                box-shadow: 0 0 20px rgba(131, 58, 180, 0.3);
+            }
+        }
+
+        /* Analytics Cards 3D Effect */
+        .card.bg-light {
+            background: var(--card-bg) !important;
+            border-radius: 20px;
+            transform-style: preserve-3d;
+        }
+
+        .card.bg-success, .card.bg-warning, .card.bg-danger {
+            border-radius: 20px;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card.bg-success:hover, .card.bg-warning:hover, .card.bg-danger:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">Social Media Scraper</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/instagram">Instagram</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/facebook">Facebook</a>
-                    </li>
-                </ul>
-            </div>
+    <div id="particles-js"></div>
+    <div class="content-wrapper">
+        <div class="background-animation">
+            <!-- Enhanced 3D Social Media Icons with Gradient Colors -->
+            <div class="social-icon" style="top: 10%; left: 5%; animation-delay: 0s;"></div>
+            <div class="social-icon" style="top: 20%; left: 15%; animation-delay: 1s;"></div>
+            <div class="social-icon" style="top: 30%; left: 25%; animation-delay: 2s;"></div>
+            <div class="social-icon" style="top: 40%; left: 35%; animation-delay: 3s;"></div>
+            <div class="social-icon" style="top: 50%; left: 45%; animation-delay: 4s;"></div>
+            <div class="social-icon" style="top: 60%; left: 55%; animation-delay: 5s;"></div>
+            <div class="social-icon" style="top: 70%; left: 65%; animation-delay: 6s;"></div>
+            <div class="social-icon" style="top: 80%; left: 75%; animation-delay: 7s;"></div>
+            <div class="social-icon" style="top: 90%; left: 85%; animation-delay: 8s;"></div>
         </div>
-    </nav>
 
-    <div class="container my-5">
-        <h1 class="text-center mb-4">Instagram Profile Scraper</h1>
-        
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body">
-                        <form id="scrapeForm">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Instagram Username</label>
-                                <input type="text" class="form-control" id="username" name="username" required 
-                                    placeholder="Enter username without @ (e.g. cristiano)">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/">Social Media Scraper</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/instagram">Instagram</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facebook">Facebook</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container my-5">
+            <h1 class="text-center mb-4">Instagram Profile Scraper</h1>
+            
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="scrapeForm">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Instagram Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" required 
+                                        placeholder="Enter username without @ (e.g. cristiano)">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Scrape Profile Data</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="loading" class="text-center mt-4" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Scraping profile data... Please wait.</p>
+                    </div>
+
+                    <div id="results" class="mt-4" style="display: none;">
+                        <div id="profile-info" class="card mb-4">
+                            <div class="card-body">
+                                <div id="profile-content"></div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Scrape Profile Data</button>
-                        </form>
-                    </div>
-                </div>
-
-                <div id="loading" class="text-center mt-4" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p>Scraping profile data... Please wait.</p>
-                </div>
-
-                <div id="results" class="mt-4" style="display: none;">
-                    <div id="profile-info" class="card mb-4">
-                        <div class="card-body">
-                            <div id="profile-content"></div>
                         </div>
-                    </div>
 
-                    <div id="posts-section" class="card mb-4">
-                        <div class="card-body">
-                            <h3 class="mb-4">Latest Posts</h3>
-                            <div id="posts-content"></div>
+                        <div id="posts-section" class="card mb-4">
+                            <div class="card-body">
+                                <h3 class="mb-4">Latest Posts</h3>
+                                <div id="posts-content"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div id="analytics-section" class="card mb-4" style="display: none;">
-                        <div class="card-body">
-                            <h3 class="mb-4">Influencer Analytics</h3>
-                            
-                            <!-- Overview Stats -->
-                            <div class="row mb-4">
-                                <div class="col-md-12">
-                                    <h5 class="border-bottom pb-2">Overview</h5>
-                                    <div class="row">
-                                        <div class="col-md-4 mb-3">
-                                            <div class="card bg-light">
-                                                <div class="card-body text-center">
-                                                    <h6>Average Engagement Rate</h6>
-                                                    <h3 class="text-primary" id="engagement-rate"></h3>
-                                                    <span class="badge" id="engagement-quality"></span>
+                        <div id="analytics-section" class="card mb-4" style="display: none;">
+                            <div class="card-body">
+                                <h3 class="mb-4">Influencer Analytics</h3>
+                                
+                                <!-- Overview Stats -->
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <h5 class="border-bottom pb-2">Overview</h5>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h6>Average Engagement Rate</h6>
+                                                        <h3 class="text-primary" id="engagement-rate"></h3>
+                                                        <span class="badge" id="engagement-quality"></span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <div class="card bg-light">
-                                                <div class="card-body text-center">
-                                                    <h6>Average Likes</h6>
-                                                    <h3 class="text-primary" id="avg-likes"></h3>
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h6>Average Likes</h6>
+                                                        <h3 class="text-primary" id="avg-likes"></h3>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <div class="card bg-light">
-                                                <div class="card-body text-center">
-                                                    <h6>Average Comments</h6>
-                                                    <h3 class="text-primary" id="avg-comments"></h3>
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h6>Average Comments</h6>
+                                                        <h3 class="text-primary" id="avg-comments"></h3>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Sentiment Analysis -->
-                            <div class="row mb-4">
-                                <div class="col-md-12">
-                                    <h5 class="border-bottom pb-2">Audience Sentiment</h5>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="card bg-success text-white">
-                                                <div class="card-body text-center">
-                                                    <h6>Positive Comments</h6>
-                                                    <h3 id="positive-comments">0</h3>
+                                <!-- Sentiment Analysis -->
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <h5 class="border-bottom pb-2">Audience Sentiment</h5>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="card bg-success text-white">
+                                                    <div class="card-body text-center">
+                                                        <h6>Positive Comments</h6>
+                                                        <h3 id="positive-comments">0</h3>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="card bg-warning">
-                                                <div class="card-body text-center">
-                                                    <h6>Neutral Comments</h6>
-                                                    <h3 id="neutral-comments">0</h3>
+                                            <div class="col-md-4">
+                                                <div class="card bg-warning">
+                                                    <div class="card-body text-center">
+                                                        <h6>Neutral Comments</h6>
+                                                        <h3 id="neutral-comments">0</h3>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="card bg-danger text-white">
-                                                <div class="card-body text-center">
-                                                    <h6>Negative Comments</h6>
-                                                    <h3 id="negative-comments">0</h3>
+                                            <div class="col-md-4">
+                                                <div class="card bg-danger text-white">
+                                                    <div class="card-body text-center">
+                                                        <h6>Negative Comments</h6>
+                                                        <h3 id="negative-comments">0</h3>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Content Analysis -->
-                            <div class="row mb-4">
-                                <div class="col-md-12">
-                                    <h5 class="border-bottom pb-2">Content Analysis</h5>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h6>Content Type Distribution</h6>
-                                                    <div id="content-types"></div>
+                                <!-- Content Analysis -->
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <h5 class="border-bottom pb-2">Content Analysis</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h6>Content Type Distribution</h6>
+                                                        <div id="content-types"></div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h6>Posting Patterns</h6>
-                                                    <p id="posting-frequency"></p>
-                                                    <p id="best-posting-time"></p>
+                                            <div class="col-md-6">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h6>Posting Patterns</h6>
+                                                        <p id="posting-frequency"></p>
+                                                        <p id="best-posting-time"></p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -241,6 +538,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script>
         function formatNumber(num) {
             if (!num) return '0';
@@ -405,6 +703,116 @@
                 document.getElementById('loading').style.display = 'none';
                 alert('Error: ' + error.message);
             }
+        });
+
+        // Initialize particles.js
+        particlesJS('particles-js', {
+            particles: {
+                number: {
+                    value: 80,
+                    density: {
+                        enable: true,
+                        value_area: 800
+                    }
+                },
+                color: {
+                    value: ['#405DE6', '#E1306C', '#F77737', '#FFDC80', '#5851DB']
+                },
+                shape: {
+                    type: 'circle',
+                    stroke: {
+                        width: 0,
+                        color: '#000000'
+                    },
+                    polygon: {
+                        nb_sides: 5
+                    }
+                },
+                opacity: {
+                    value: 0.5,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 1,
+                        opacity_min: 0.1,
+                        sync: false
+                    }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 2,
+                        size_min: 0.1,
+                        sync: false
+                    }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#ffffff',
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: true,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false,
+                    attract: {
+                        enable: true,
+                        rotateX: 600,
+                        rotateY: 1200
+                    }
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: 'grab'
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: 'push'
+                    },
+                    resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 140,
+                        line_linked: {
+                            opacity: 0.5
+                        }
+                    },
+                    push: {
+                        particles_nb: 4
+                    }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Add mouse movement effect
+        document.addEventListener('mousemove', function(e) {
+            const particles = document.querySelector('#particles-js');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            particles.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+        });
+
+        // Add scroll effect
+        window.addEventListener('scroll', function() {
+            const particles = document.querySelector('#particles-js');
+            const scrollPosition = window.scrollY;
+            
+            particles.style.transform = `translateY(${scrollPosition * 0.5}px)`;
         });
     </script>
 </body>
