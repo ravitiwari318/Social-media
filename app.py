@@ -6,11 +6,40 @@ from collections import Counter
 import re
 from datetime import datetime, timedelta
 import numpy as np
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import bcrypt
+
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///users.db"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = "secret_key"
+
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+
+    def __repr__(self):
+        return f'<User {self.name}>'
+    
+    def __init__(self, name, email, password):
+        self.name = name
+        self.email = email
+        self.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
+
+with app.app_context():
+    db.create_all()
+
 
 # Initialize the ApifyClient with your API token
 client = ApifyClient("apify_api_KHXHucwuRukhv77x53Phu378m64N7o0zJKwP")
@@ -200,6 +229,48 @@ def instagram():
 def facebook():
     return render_template('facebook.html')
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if not email or not password:
+            return jsonify({"success": False, "error": "Email and password are required"})
+
+        # Authenticate user
+        user = User.query.filter_by(email=email).first()
+        if user and user.check_password(password):
+            return jsonify({"success": True, "message": "Login successful"})
+        else:
+            return jsonify({"success": False, "error": "Invalid email or password"})
+
+    return render_template('loginpage.html', mode='login')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        if not name or not email or not password:
+            return jsonify({"success": False, "error": "All fields are required for signup"})
+
+        # Check if user already exists
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            return jsonify({"success": False, "error": "User already exists"})
+
+        # Create new user
+        new_user = User(name=name, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({"success": True, "message": "User registered successfully"})
+
+    return render_template('loginpage.html', mode='signup')
+
 @app.route('/scrape_instagram', methods=['POST'])
 def scrape_instagram():
     try:
@@ -385,16 +456,98 @@ def scrape_instagram():
 @app.route('/scrape_facebook', methods=['POST'])
 def scrape_facebook():
     try:
-        username = request.form.get('username')
+        username = request.form.get('username').strip()
+        if not username:
+            return jsonify({"success": False, "error": "Username or profile URL is required"})
+        
+        print(f"\n=== Starting Facebook analysis for: {username} ===")
+
+        # Extract username/url if provided with full URL
+        if 'facebook.com' in username:
+            username = username.split('facebook.com/')[-1].rstrip('/')
+        
+        # Get profile and posts data
+        scrape_input = {
+            "startUrls": [{
+                "url": f"https://www.facebook.com/{username}"
+            }],
+            "resultsLimit": 10
+        }
+
+        print("Starting scrape with meta-scraper...")
+        scrape_run = client.actor("apify/meta-scraper").call(run_input=scrape_input)
+        
+        results = []
+        for item in client.dataset(scrape_run["defaultDatasetId"]).iterate_items():
+            results.append(item)
+
+        if not results:
+            return jsonify({"success": False, "error": "No profile data found"})
+
+        profile_info = results[0]
+        posts_data = []
+        total_reactions = 0
+        total_comments = 0
+        total_shares = 0
+
+        # Process posts data
+        for item in results:
+            if 'posts' in item:
+                for post in item['posts']:
+                    post_data = {
+                        "text": post.get("text", ""),
+                        "imageUrl": post.get("imageUrl", ""),
+                        "reactions": post.get("reactions", {}).get("total", 0),
+                        "comments": post.get("commentsCount", 0),
+                        "shares": post.get("sharesCount", 0),
+                        "timestamp": post.get("publishedDate")
+                    }
+                    posts_data.append(post_data)
+                    total_reactions += post_data["reactions"]
+                    total_comments += post_data["comments"]
+                    total_shares += post_data["shares"]
+
+        # Calculate analytics
+        avg_reactions = total_reactions / len(posts_data) if posts_data else 0
+        avg_comments = total_comments / len(posts_data) if posts_data else 0
+        avg_shares = total_shares / len(posts_data) if posts_data else 0
+
+        followers_count = profile_info.get("followersCount", 0)
+        engagement_rate = ((total_reactions + total_comments + total_shares) / (len(posts_data) * followers_count) * 100) if followers_count and posts_data else 0
+
+        posting_frequency = analyze_posting_frequency(posts_data)
+
+        analytics = {
+            "engagement_rate": round(engagement_rate, 2),
+            "avg_reactions": round(avg_reactions, 2),
+            "avg_comments": round(avg_comments, 2),
+            "avg_shares": round(avg_shares, 2),
+            "posting_frequency": posting_frequency.get("frequency", "N/A")
+        }
+
+        print("\n=== Analysis Complete ===")
+
         return jsonify({
             "success": True,
             "data": {
-                "message": "Facebook scraping functionality coming soon!",
-                "username": username
+                "profile_info": {
+                    "username": profile_info.get("username", username),
+                    "name": profile_info.get("name", ""),
+                    "about": profile_info.get("about", ""),
+                    "profilePicUrl": profile_info.get("profilePicUrl", ""),
+                    "followersCount": followers_count,
+                    "isVerified": profile_info.get("verified", False)
+                },
+                "posts": posts_data,
+                "analytics": analytics
             }
         })
+
     except Exception as e:
+        print(f"\n=== Error occurred: {str(e)} ===")
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=False)
