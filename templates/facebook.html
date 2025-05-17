@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facebook Profile Scraper</title>
+    <title>Facebook Profile Analytics</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.7.1/dist/gsap.min.js"></script>
     <style>
         :root {
             --primary-color: #1877F2;
@@ -16,58 +14,167 @@
             --text-secondary: #666666;
             --background-light: #f8f9fa;
             --card-bg: rgba(255, 255, 255, 0.85);
+            --card-shadow: 0 4px 16px rgba(24, 119, 242, 0.08);
         }
-
-        /* Shared styles with Instagram but with Facebook colors */
         body {
-            background: var(--background-light);
+            background-color: var(--background-light);
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-primary);
+            margin: 0;
         }
-
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #1a237e 0%, #1877F2 100%);
+            overflow: hidden;
+        }
+        .social-icon {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #1877F2, #42B72A);
+            animation: float 15s infinite linear;
+            opacity: 0.8;
+            transform-style: preserve-3d;
+            box-shadow: 0 0 20px rgba(24, 119, 242, 0.3);
+        }
+        .social-icon:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .social-icon:nth-child(2) { top: 20%; left: 15%; animation-delay: 1s; }
+        .social-icon:nth-child(3) { top: 30%; left: 25%; animation-delay: 2s; }
+        .social-icon:nth-child(4) { top: 40%; left: 35%; animation-delay: 3s; }
+        .social-icon:nth-child(5) { top: 50%; left: 45%; animation-delay: 4s; }
+        .social-icon:nth-child(6) { top: 60%; left: 55%; animation-delay: 5s; }
+        .social-icon:nth-child(7) { top: 70%; left: 65%; animation-delay: 6s; }
+        .social-icon:nth-child(8) { top: 80%; left: 75%; animation-delay: 7s; }
+        .social-icon:nth-child(9) { top: 90%; left: 85%; animation-delay: 8s; }
+        @keyframes float {
+            0% { transform: translateY(0) rotateX(0deg) rotateY(0deg) scale(1); }
+            25% { transform: translateY(-50px) rotateX(45deg) rotateY(45deg) scale(1.2); }
+            50% { transform: translateY(-100px) rotateX(90deg) rotateY(90deg) scale(1); }
+            75% { transform: translateY(-50px) rotateX(135deg) rotateY(135deg) scale(1.2); }
+            100% { transform: translateY(0) rotateX(360deg) rotateY(360deg) scale(1); }
+        }
+        .navbar {
+            background: rgba(255,255,255,0.95) !important;
+            box-shadow: 0 2px 8px rgba(24,119,242,0.06);
+        }
+        .navbar-brand, .nav-link {
+            color: var(--primary-color) !important;
+        }
+        .nav-link.active {
+            color: var(--accent-color) !important;
+        }
         .card {
             background: var(--card-bg);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: var(--card-shadow);
+            border-radius: 18px;
+            border: none;
+            position: relative;
         }
-
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 15px 40px rgba(24, 119, 242, 0.2);
         }
-
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(24, 119, 242, 0.08));
+            border-radius: inherit;
+            pointer-events: none;
+        }
         .stat-item {
             text-align: center;
-            padding: 1rem;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
+        .stat-item:hover {
+            transform: scale(1.1) translateZ(20px);
+        }
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 600;
-            color: var(--primary-color);
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(24, 119, 242, 0.2);
         }
-
         .stat-label {
             color: var(--text-secondary);
             font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
-        #loading {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            padding: 2rem;
+        .form-control {
+            background: rgba(255,255,255,0.95);
+            border: 1px solid #e0e0e0;
+            color: var(--text-primary) !important;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 1px 4px rgba(24,119,242,0.04);
         }
-
-        .verified-badge {
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(24,119,242,0.08);
+        }
+        .form-control::placeholder {
+            color: var(--text-secondary) !important;
+            opacity: 1;
+        }
+        .spinner-border {
             color: var(--primary-color);
-            margin-left: 0.5rem;
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3em;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(1); box-shadow: 0 0 20px rgba(24, 119, 242, 0.2); }
+            50% { transform: rotate(180deg) scale(1.2); box-shadow: 0 0 30px rgba(24, 119, 242, 0.3); }
+            100% { transform: rotate(360deg) scale(1); box-shadow: 0 0 20px rgba(24, 119, 242, 0.2); }
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border: none;
+            color: #fff;
+            border-radius: 25px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(24,119,242,0.10);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+        }
+        .btn-primary:active {
+            transform: translateY(0) translateZ(0);
         }
     </style>
 </head>
 <body>
+    <div class="background-animation">
+        <div class="social-icon"></div>
+        <div class="social-icon"></div>
+        <div class="social-icon"></div>
+        <div class="social-icon"></div>
+        <div class="social-icon"></div>
+        <div class="social-icon"></div>
+        <div class="social-icon"></div>
+        <div class="social-icon"></div>
+        <div class="social-icon"></div>
+    </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand" href="/">Social Media Scraper</a>
+            <a class="navbar-brand" href="/">Social Media Analytics</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -86,76 +193,58 @@
             </div>
         </div>
     </nav>
-
     <div class="container my-5">
-        <h1 class="text-center mb-4">Facebook Profile Scraper</h1>
-        
+        <h1 class="text-center mb-4">Facebook Profile Analytics</h1>
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body">
                         <form id="scrapeForm">
                             <div class="mb-3">
-                                <label for="username" class="form-label">Facebook Username or Profile URL</label>
+                                <label for="username" class="form-label">Facebook Page Username or URL</label>
                                 <input type="text" class="form-control" id="username" name="username" required 
-                                    placeholder="Enter username or profile URL">
+                                    placeholder="Enter page username or URL">
                             </div>
-                            <button type="submit" class="btn btn-primary">Scrape Profile Data</button>
+                            <button type="submit" class="btn btn-primary">Analyze Profile</button>
                         </form>
                     </div>
                 </div>
-
                 <div id="loading" class="text-center mt-4" style="display: none;">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p>Scraping profile data... Please wait.</p>
+                    <p>Analyzing profile data... Please wait.</p>
                 </div>
-
                 <div id="results" class="mt-4" style="display: none;">
-                    <div id="profile-info" class="card mb-4">
-                        <div class="card-body">
-                            <div id="profile-content"></div>
-                        </div>
-                    </div>
-
-                    <div id="posts-section" class="card mb-4">
-                        <div class="card-body">
-                            <h3 class="mb-4">Latest Posts</h3>
-                            <div id="posts-content"></div>
-                        </div>
-                    </div>
-
-                    <div id="analytics-section" class="card mb-4">
+                    <div class="card mb-4">
                         <div class="card-body">
                             <h3 class="mb-4">Profile Analytics</h3>
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="stat-item">
-                                        <div id="engagement-rate" class="stat-value">0%</div>
-                                        <div class="stat-label">Engagement Rate</div>
+                                        <div id="avg-likes" class="stat-value">0</div>
+                                        <div class="stat-label">Avg. Likes</div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="stat-item">
-                                        <div id="avg-reactions" class="stat-value">0</div>
-                                        <div class="stat-label">Avg. Reactions</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="stat-item">
-                                        <div id="posting-frequency" class="stat-value">-</div>
-                                        <div class="stat-label">Posting Frequency</div>
+                                        <div id="avg-comments" class="stat-value">0</div>
+                                        <div class="stat-label">Avg. Comments</div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="mb-4">Recent Posts</h3>
+                            <div id="recent-posts"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function formatNumber(num) {
@@ -168,96 +257,50 @@
             }
             return num.toString();
         }
-
         function formatDate(timestamp) {
             if (!timestamp) return '';
-            return new Date(timestamp * 1000).toLocaleDateString();
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         }
-
-        function displayProfileInfo(profileData) {
-            const content = `
-                <div class="row">
-                    <div class="col-md-4 text-center">
-                        <img src="${profileData.profilePicUrl || 'https://via.placeholder.com/150'}" 
-                             class="rounded-circle mb-3" alt="Profile Picture" 
-                             style="width: 150px; height: 150px; object-fit: cover;">
-                    </div>
-                    <div class="col-md-8">
-                        <h2 class="mb-2">
-                            ${profileData.name || profileData.username}
-                            ${profileData.isVerified ? '<svg class="verified-badge" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>' : ''}
-                        </h2>
-                        <p class="text-muted">@${profileData.username}</p>
-                        <p>${profileData.about || ''}</p>
-                        <div class="row text-center">
-                            <div class="col">
-                                <div class="stat-value">${formatNumber(profileData.friendsCount)}</div>
-                                <div class="stat-label">Friends</div>
-                            </div>
-                            <div class="col">
-                                <div class="stat-value">${formatNumber(profileData.followersCount)}</div>
-                                <div class="stat-label">Followers</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('profile-content').innerHTML = content;
-        }
-
-        function displayPosts(posts) {
+        function displayRecentPosts(posts) {
             if (!posts || posts.length === 0) {
-                document.getElementById('posts-content').innerHTML = '<p class="text-muted">No posts found</p>';
+                document.getElementById('recent-posts').innerHTML = '<p class="text-muted">No posts found</p>';
                 return;
             }
-
             const postsHtml = posts.map(post => `
-                <div class="card mb-3">
+                <div class="card mb-2">
                     <div class="card-body">
-                        <p class="card-text">${post.text || ''}</p>
-                        ${post.imageUrl ? `<img src="${post.imageUrl}" class="img-fluid rounded mb-2" alt="Post image">` : ''}
-                        <div class="d-flex justify-content-between align-items-center mt-3">
+                        <p class="card-text">${post.message ? post.message : "<span class='text-muted'>(No text)</span>"}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
                             <div>
-                                ❤️ ${formatNumber(post.reactions)} reactions
-                                💬 ${formatNumber(post.comments)} comments
-                                🔄 ${formatNumber(post.shares)} shares
+                                👍 ${formatNumber(post.likes)} Likes
+                                💬 ${formatNumber(post.comments)} Comments
                             </div>
-                            <small class="text-muted">${formatDate(post.timestamp)}</small>
+                            <a href="${post.url}" target="_blank" class="btn btn-sm btn-outline-primary">View Post</a>
                         </div>
+                        <small class="text-muted">${formatDate(post.timestamp)}</small>
                     </div>
                 </div>
             `).join('');
-
-            document.getElementById('posts-content').innerHTML = postsHtml;
+            document.getElementById('recent-posts').innerHTML = postsHtml;
         }
-
-        function displayAnalytics(analytics) {
-            document.getElementById('engagement-rate').textContent = analytics.engagement_rate + '%';
-            document.getElementById('avg-reactions').textContent = formatNumber(analytics.avg_reactions);
-            document.getElementById('posting-frequency').textContent = analytics.posting_frequency;
-            document.getElementById('analytics-section').style.display = 'block';
-        }
-
         document.getElementById('scrapeForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             document.getElementById('loading').style.display = 'block';
             document.getElementById('results').style.display = 'none';
-            
             try {
                 const formData = new FormData(this);
                 const response = await fetch('/scrape_facebook', {
                     method: 'POST',
                     body: formData
                 });
-                
                 const data = await response.json();
                 document.getElementById('loading').style.display = 'none';
-                
                 if (data.success) {
-                    displayProfileInfo(data.data.profile_info);
-                    displayPosts(data.data.posts);
-                    displayAnalytics(data.data.analytics);
+                    const profile = data.data.profile_info;
+                    document.getElementById('avg-likes').textContent = formatNumber(profile.avg_likes);
+                    document.getElementById('avg-comments').textContent = formatNumber(profile.avg_comments);
+                    displayRecentPosts(profile.recent_posts);
                     document.getElementById('results').style.display = 'block';
                 } else {
                     alert('Error: ' + data.error);

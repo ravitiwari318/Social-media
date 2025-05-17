@@ -8,10 +8,15 @@ from datetime import datetime, timedelta
 import numpy as np
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import bcrypt
+import requests
 
 
 # Load environment variables
 load_dotenv()
+
+# Initialize Apify client
+# client = ApifyClient("apify_api_KHXHucwuRukhv77x53Phu378m64N7o0zJKwP")
+client = ApifyClient("apify_api_IOF2svsOQZi8qArYcH51Wxi25T9hAE4C7qW3")
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///users.db"
@@ -39,10 +44,6 @@ class User(db.Model):
 
 with app.app_context():
     db.create_all()
-
-
-# Initialize the ApifyClient with your API token
-client = ApifyClient("apify_api_KHXHucwuRukhv77x53Phu378m64N7o0zJKwP")
 
 def analyze_sentiment(text):
     if not text:
@@ -228,6 +229,64 @@ def instagram():
 @app.route('/facebook')
 def facebook():
     return render_template('facebook.html')
+
+@app.route('/test_apify', methods=['GET'])
+def test_apify():
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        try:
+            print("\n=== Testing Apify API Key ===")
+            
+            # Test 1: Check API key format
+            api_key = "apify_api_IOF2svsOQZi8qArYcH51Wxi25T9hAE4C7qW3"
+            if not api_key.startswith("apify_api_"):
+                return jsonify({
+                    "success": False,
+                    "error": "Invalid API key format. API key should start with 'apify_api_'"
+                })
+
+            # Test 2: Try to get user info
+            print("Fetching user info...")
+            user_info = client.user().get()
+            print(f"User info: {user_info}")
+
+            # Test 3: List available actors
+            print("\nFetching available actors...")
+            actors = client.actors().list()
+            print(f"Found {len(actors.items)} actors")
+
+            # Test 4: Try to run a simple actor
+            print("\nTesting actor execution...")
+            run_input = {
+                "startUrls": [{
+                    "url": "https://www.example.com"
+                }]
+            }
+            
+            run = client.actor("apify/basic-crawler").call(run_input=run_input)
+            print(f"Run ID: {run['id']}")
+
+            return jsonify({
+                "success": True,
+                "message": "API key is valid and working",
+                "details": {
+                    "user_id": user_info.get("id"),
+                    "username": user_info.get("username"),
+                    "available_actors": len(actors.items),
+                    "test_run_id": run['id']
+                }
+            })
+
+        except Exception as e:
+            print(f"\n=== Error occurred: {str(e)} ===")
+            import traceback
+            traceback.print_exc()
+            return jsonify({
+                "success": False,
+                "error": str(e),
+                "message": "There was an error testing the API key. Please check the error message above."
+            })
+    else:
+        return render_template('test_apify.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -458,95 +517,66 @@ def scrape_facebook():
     try:
         username = request.form.get('username').strip()
         if not username:
-            return jsonify({"success": False, "error": "Username or profile URL is required"})
-        
-        print(f"\n=== Starting Facebook analysis for: {username} ===")
+            return jsonify({"success": False, "error": "Username is required"})
 
-        # Extract username/url if provided with full URL
+        # If a full URL is provided, extract the username
         if 'facebook.com' in username:
             username = username.split('facebook.com/')[-1].rstrip('/')
-        
-        # Get profile and posts data
-        scrape_input = {
-            "startUrls": [{
-                "url": f"https://www.facebook.com/{username}"
-            }],
-            "resultsLimit": 10
+
+        # 1. Get page_id
+        url_id = "https://facebook-scraper3.p.rapidapi.com/page/page_id"
+        querystring_id = {"url": f"https://facebook.com/{username}"}
+        headers = {
+            "x-rapidapi-key": "46807b9594msh308299241c6db03p14e1a8jsndc6f4478fd0c",
+            "x-rapidapi-host": "facebook-scraper3.p.rapidapi.com"
         }
+        response_id = requests.get(url_id, headers=headers, params=querystring_id)
+        id_data = response_id.json()
+        page_id = id_data.get('page_id')
+        if not page_id:
+            return jsonify({"success": False, "error": "Page ID not found.", "id_data": id_data})
 
-        print("Starting scrape with meta-scraper...")
-        scrape_run = client.actor("apify/meta-scraper").call(run_input=scrape_input)
-        
-        results = []
-        for item in client.dataset(scrape_run["defaultDatasetId"]).iterate_items():
-            results.append(item)
+        # 2. Get posts
+        url_posts = "https://facebook-scraper3.p.rapidapi.com/page/posts"
+        querystring_posts = {"page_id": page_id}
+        response_posts = requests.get(url_posts, headers=headers, params=querystring_posts)
+        posts_data = response_posts.json()
+        posts = posts_data.get('results', []) or posts_data.get('posts', [])
 
-        if not results:
-            return jsonify({"success": False, "error": "No profile data found"})
-
-        profile_info = results[0]
-        posts_data = []
-        total_reactions = 0
+        # Calculate average likes and comments
+        total_likes = 0
         total_comments = 0
-        total_shares = 0
+        post_count = 0
+        recent_posts = []
+        for post in posts[:10]:  # Only use the latest 10 posts
+            likes = post.get('reactions_count', 0)
+            comments = post.get('comments_count', 0)
+            total_likes += int(likes)
+            total_comments += int(comments)
+            post_count += 1
+            recent_posts.append({
+                "post_id": post.get('post_id'),
+                "message": post.get('message'),
+                "likes": likes,
+                "comments": comments,
+                "timestamp": post.get('timestamp'),
+                "url": post.get('url')
+            })
 
-        # Process posts data
-        for item in results:
-            if 'posts' in item:
-                for post in item['posts']:
-                    post_data = {
-                        "text": post.get("text", ""),
-                        "imageUrl": post.get("imageUrl", ""),
-                        "reactions": post.get("reactions", {}).get("total", 0),
-                        "comments": post.get("commentsCount", 0),
-                        "shares": post.get("sharesCount", 0),
-                        "timestamp": post.get("publishedDate")
-                    }
-                    posts_data.append(post_data)
-                    total_reactions += post_data["reactions"]
-                    total_comments += post_data["comments"]
-                    total_shares += post_data["shares"]
-
-        # Calculate analytics
-        avg_reactions = total_reactions / len(posts_data) if posts_data else 0
-        avg_comments = total_comments / len(posts_data) if posts_data else 0
-        avg_shares = total_shares / len(posts_data) if posts_data else 0
-
-        followers_count = profile_info.get("followersCount", 0)
-        engagement_rate = ((total_reactions + total_comments + total_shares) / (len(posts_data) * followers_count) * 100) if followers_count and posts_data else 0
-
-        posting_frequency = analyze_posting_frequency(posts_data)
-
-        analytics = {
-            "engagement_rate": round(engagement_rate, 2),
-            "avg_reactions": round(avg_reactions, 2),
-            "avg_comments": round(avg_comments, 2),
-            "avg_shares": round(avg_shares, 2),
-            "posting_frequency": posting_frequency.get("frequency", "N/A")
-        }
-
-        print("\n=== Analysis Complete ===")
+        avg_likes = total_likes / post_count if post_count else 0
+        avg_comments = total_comments / post_count if post_count else 0
 
         return jsonify({
             "success": True,
             "data": {
                 "profile_info": {
-                    "username": profile_info.get("username", username),
-                    "name": profile_info.get("name", ""),
-                    "about": profile_info.get("about", ""),
-                    "profilePicUrl": profile_info.get("profilePicUrl", ""),
-                    "followersCount": followers_count,
-                    "isVerified": profile_info.get("verified", False)
-                },
-                "posts": posts_data,
-                "analytics": analytics
+                    "avg_likes": round(avg_likes, 2),
+                    "avg_comments": round(avg_comments, 2),
+                    "recent_posts": recent_posts
+                }
             }
         })
-
     except Exception as e:
-        print(f"\n=== Error occurred: {str(e)} ===")
-        import traceback
-        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)})
 
 if __name__ == '__main__':
